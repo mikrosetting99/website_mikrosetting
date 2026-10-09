@@ -7,6 +7,7 @@ import { signOutAction } from "@/app/(auth)/actions";
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -35,26 +36,28 @@ export function UserMenu({ user }: UserMenuProps) {
         </Avatar>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56">
-        <DropdownMenuLabel className="truncate">{user.name ?? user.email}</DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem render={<Link href="/profile" />}>
-          <UserIcon className="h-4 w-4" />
-          Profil
-        </DropdownMenuItem>
-        <DropdownMenuItem render={<Link href="/coins" />}>
-          <Coins className="h-4 w-4" />
-          Beli Koin
-        </DropdownMenuItem>
-        <DropdownMenuItem render={<Link href="/history" />}>
-          <History className="h-4 w-4" />
-          Riwayat Tool
-        </DropdownMenuItem>
-        {user.role === "ADMIN" && (
-          <DropdownMenuItem render={<Link href="/admin" />}>
-            <LayoutDashboard className="h-4 w-4" />
-            Admin Panel
+        <DropdownMenuGroup>
+          <DropdownMenuLabel className="truncate">{user.name ?? user.email}</DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem render={<Link href="/profile" />}>
+            <UserIcon className="h-4 w-4" />
+            Profil
           </DropdownMenuItem>
-        )}
+          <DropdownMenuItem render={<Link href="/coins" />}>
+            <Coins className="h-4 w-4" />
+            Beli Koin
+          </DropdownMenuItem>
+          <DropdownMenuItem render={<Link href="/history" />}>
+            <History className="h-4 w-4" />
+            Riwayat Tool
+          </DropdownMenuItem>
+          {user.role === "ADMIN" && (
+            <DropdownMenuItem render={<Link href="/admin" />}>
+              <LayoutDashboard className="h-4 w-4" />
+              Admin Panel
+            </DropdownMenuItem>
+          )}
+        </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuItem onSelect={() => signOutAction()}>
           <LogOut className="h-4 w-4" />
