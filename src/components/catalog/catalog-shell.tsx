@@ -1,17 +1,20 @@
-﻿"use client";
+"use client";
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { Search, ChevronRight, Coins, LogIn } from "lucide-react";
+import { Search, ChevronRight, ChevronLeft } from "lucide-react";
 
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { AccessBadge } from "./access-badge";
+import { ToolCard } from "./tool-card";
+import { HeroBanner } from "./hero-banner";
+import { CategoryIconGrid } from "./category-icon-grid";
+import { CategoryBreakdown } from "./category-breakdown";
 import { DynamicIcon } from "@/lib/icons";
 import { cn } from "@/lib/utils";
 import { MobileBottomNav } from "@/components/layout/mobile-bottom-nav";
-import { UserMenu } from "@/components/layout/user-menu";
-import type { Category, Tool, ToolAccessType } from "@/generated/prisma/client";
+import { Sidebar } from "@/components/layout/sidebar";
+import { TopBar } from "@/components/layout/top-bar";
+import type { Category, Tool } from "@/generated/prisma/client";
 
 type ToolWithCategory = Tool & { category: Category };
 
@@ -25,6 +28,19 @@ interface CatalogShellProps {
 export function CatalogShell({ categories, tools, user, coinBalance }: CatalogShellProps) {
   const [query, setQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState<string>("all");
+  const [showAllList, setShowAllList] = useState(false);
+
+  function handleSelectCategory(categoryId: string) {
+    setActiveCategory(categoryId);
+    setShowAllList(false);
+  }
+
+  function handleShowAll() {
+    setActiveCategory("all");
+    setShowAllList(true);
+  }
+
+  const isListView = query.trim() !== "" || activeCategory !== "all" || showAllList;
 
   const filteredTools = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -40,87 +56,142 @@ export function CatalogShell({ categories, tools, user, coinBalance }: CatalogSh
     });
   }, [tools, query, activeCategory]);
 
+  const featuredTools = useMemo(() => tools.filter((tool) => tool.isFeatured).slice(0, 4), [tools]);
+
+  const toolCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    for (const tool of tools) {
+      counts[tool.categoryId] = (counts[tool.categoryId] ?? 0) + 1;
+    }
+    return counts;
+  }, [tools]);
+
+  const otherTools = useMemo(() => {
+    const featuredIds = new Set(featuredTools.map((t) => t.id));
+    return tools.filter((tool) => !featuredIds.has(tool.id)).slice(0, 8);
+  }, [tools, featuredTools]);
+
   return (
-    <div className="flex min-h-screen flex-col bg-background pb-16 md:pb-0">
-      <header className="sticky top-0 z-20 border-b bg-background/95 backdrop-blur">
-        <div className="mx-auto flex max-w-4xl items-center gap-3 px-4 py-3">
-          <Link href="/" className="shrink-0 text-lg font-bold tracking-tight text-primary">
-            MIKROSETTING
-          </Link>
+    <div className="flex min-h-screen flex-col bg-muted/20 pb-16 md:pb-0">
+      <TopBar query={query} onQueryChange={setQuery} user={user} coinBalance={coinBalance} />
 
-          <div className="relative hidden flex-1 md:block">
-            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Cari tool, script, template..."
-              className="pl-9"
-            />
-          </div>
+      <div className="flex flex-1">
+        <Sidebar
+          categories={categories}
+          activeCategory={activeCategory}
+          onSelectCategory={handleSelectCategory}
+        />
 
-          <div className="ml-auto flex items-center gap-2">
-            {user ? (
-              <>
-                <div className="hidden items-center gap-1.5 rounded-full border bg-secondary px-3 py-1.5 text-sm font-medium text-secondary-foreground sm:flex">
-                  <Coins className="h-4 w-4 text-primary" />
-                  {coinBalance} Koin
-                </div>
-                <UserMenu user={user} />
-              </>
-            ) : (
-              <Button size="sm" render={<Link href="/login" />}>
-                <LogIn className="h-4 w-4" />
-                Login
-              </Button>
-            )}
-          </div>
-        </div>
+        <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-4 sm:px-6 sm:py-6">
+          {isListView && (
+            <div className="mb-4 flex gap-2 overflow-x-auto md:hidden">
+              <CategoryPill
+                label="Semua"
+                active={activeCategory === "all"}
+                onClick={() => handleSelectCategory("all")}
+              />
+              {categories.map((category) => (
+                <CategoryPill
+                  key={category.id}
+                  label={category.name}
+                  icon={category.icon}
+                  active={activeCategory === category.id}
+                  onClick={() => handleSelectCategory(category.id)}
+                />
+              ))}
+            </div>
+          )}
 
-        <div className="relative px-4 pb-3 md:hidden">
-          <Search className="pointer-events-none absolute left-7 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Cari tool, script, template..."
-            className="pl-9"
-          />
-        </div>
+          {isListView ? (
+            <div className="flex flex-col gap-3">
+              <div className="flex items-center justify-between">
+                <button
+                  onClick={() => {
+                    setQuery("");
+                    handleSelectCategory("all");
+                  }}
+                  className="inline-flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-foreground"
+                >
+                  <ChevronLeft className="h-4 w-4" /> Kembali ke Beranda
+                </button>
+                <span className="text-sm text-muted-foreground">
+                  {filteredTools.length} tool ditemukan
+                </span>
+              </div>
+              <ToolListView tools={filteredTools} />
+            </div>
+          ) : (
+            <div className="flex flex-col gap-8">
+              <HeroBanner query={query} onQueryChange={setQuery} />
 
-        <div className="scrollbar-none flex gap-2 overflow-x-auto px-4 pb-3">
-          <CategoryPill
-            label="Semua"
-            active={activeCategory === "all"}
-            onClick={() => setActiveCategory("all")}
-          />
-          {categories.map((category) => (
-            <CategoryPill
-              key={category.id}
-              label={category.name}
-              icon={category.icon}
-              active={activeCategory === category.id}
-              onClick={() => setActiveCategory(category.id)}
-            />
-          ))}
-        </div>
-      </header>
+              <CategoryIconGrid
+                categories={categories}
+                activeCategory={activeCategory}
+                onSelectCategory={handleSelectCategory}
+              />
 
-      <main className="mx-auto w-full max-w-4xl flex-1 px-4 py-3">
-        {filteredTools.length === 0 ? (
-          <div className="flex flex-col items-center justify-center gap-2 py-16 text-center text-muted-foreground">
-            <Search className="h-8 w-8" />
-            <p>Tidak ada tool yang cocok dengan pencarian Anda.</p>
-          </div>
-        ) : (
-          <ul className="divide-y rounded-lg border bg-card">
-            {filteredTools.map((tool) => (
-              <ToolRow key={tool.id} tool={tool} />
-            ))}
-          </ul>
-        )}
-      </main>
+              {featuredTools.length > 0 && (
+                <section className="flex flex-col gap-3">
+                  <SectionHeader title="Tool Populer" onShowAll={handleShowAll} />
+                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                    {featuredTools.map((tool) => (
+                      <ToolCard key={tool.id} tool={tool} />
+                    ))}
+                  </div>
+                </section>
+              )}
+
+              <section className="flex flex-col gap-3">
+                <SectionHeader title="Kategori Lainnya" onShowAll={handleShowAll} />
+                <CategoryBreakdown
+                  categories={categories}
+                  toolCounts={toolCounts}
+                  otherTools={otherTools}
+                  activeCategory={activeCategory}
+                  onSelectCategory={handleSelectCategory}
+                />
+              </section>
+            </div>
+          )}
+        </main>
+      </div>
 
       <MobileBottomNav />
     </div>
+  );
+}
+
+function SectionHeader({ title, onShowAll }: { title: string; onShowAll: () => void }) {
+  return (
+    <div className="flex items-center justify-between">
+      <h2 className="text-lg font-semibold text-foreground">{title}</h2>
+      <button
+        onClick={onShowAll}
+        className="inline-flex items-center gap-0.5 text-sm font-medium text-primary hover:underline"
+      >
+        Lihat Semua
+        <ChevronRight className="h-3.5 w-3.5" />
+      </button>
+    </div>
+  );
+}
+
+function ToolListView({ tools }: { tools: ToolWithCategory[] }) {
+  if (tools.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center gap-2 py-16 text-center text-muted-foreground">
+        <Search className="h-8 w-8" />
+        <p>Tidak ada tool yang cocok dengan pencarian Anda.</p>
+      </div>
+    );
+  }
+
+  return (
+    <ul className="divide-y rounded-xl border bg-card">
+      {tools.map((tool) => (
+        <ToolRow key={tool.id} tool={tool} />
+      ))}
+    </ul>
   );
 }
 
@@ -169,7 +240,7 @@ function ToolRow({ tool }: { tool: ToolWithCategory }) {
           </span>
         </span>
 
-        <AccessBadge type={tool.accessType as ToolAccessType} />
+        <AccessBadge type={tool.accessType} />
 
         <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" />
       </Link>

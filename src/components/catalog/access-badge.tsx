@@ -10,7 +10,7 @@ const LABELS: Record<ToolAccessType, string> = {
 
 const STYLES: Record<ToolAccessType, string> = {
   FREE: "border-emerald-200 bg-emerald-50 text-emerald-700",
-  COIN: "border-blue-200 bg-blue-50 text-blue-700",
+  COIN: "border-amber-200 bg-amber-50 text-amber-700",
   SUBSCRIBER: "border-violet-200 bg-violet-50 text-violet-700",
 };
 

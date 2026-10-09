@@ -38,6 +38,7 @@ const TOOLS = [
     accessType: "FREE" as const,
     coinCost: 0,
     sortOrder: 2,
+    isFeatured: true,
   },
   {
     categorySlug: "vpn",
@@ -61,6 +62,7 @@ const TOOLS = [
     accessType: "COIN" as const,
     coinCost: 10,
     sortOrder: 4,
+    isFeatured: true,
   },
   {
     categorySlug: "tools",
