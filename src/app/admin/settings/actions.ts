@@ -22,8 +22,13 @@ export async function updateSettingsAction(
       registration_enabled: formData.get("registration_enabled") === "on" ? "true" : "false",
       coin_system_enabled: formData.get("coin_system_enabled") === "on" ? "true" : "false",
       subscription_enabled: formData.get("subscription_enabled") === "on" ? "true" : "false",
+      hero_badge: String(formData.get("hero_badge") ?? ""),
+      hero_title: String(formData.get("hero_title") ?? ""),
+      hero_subtitle: String(formData.get("hero_subtitle") ?? ""),
     });
     revalidatePath("/admin/settings");
+    revalidatePath("/");
+    revalidatePath("/admin", "layout");
     return { success: true };
   } catch (error) {
     return { error: error instanceof Error ? error.message : "Gagal menyimpan pengaturan." };

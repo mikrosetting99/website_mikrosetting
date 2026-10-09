@@ -42,7 +42,7 @@ export function AdminSidebarNav() {
               "flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
               active
                 ? "bg-primary text-primary-foreground"
-                : "text-foreground/80 hover:bg-accent hover:text-foreground",
+                : "text-slate-300 hover:bg-slate-800 hover:text-white",
             )}
           >
             <item.icon className="h-4 w-4" />
@@ -51,7 +51,7 @@ export function AdminSidebarNav() {
         );
       })}
 
-      <div className="my-2 border-t" />
+      <div className="my-2 border-t border-slate-800" />
 
       <Link
         href="/admin/settings"
@@ -59,7 +59,7 @@ export function AdminSidebarNav() {
           "flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
           pathname.startsWith("/admin/settings")
             ? "bg-primary text-primary-foreground"
-            : "text-foreground/80 hover:bg-accent hover:text-foreground",
+            : "text-slate-300 hover:bg-slate-800 hover:text-white",
         )}
       >
         <Settings className="h-4 w-4" />

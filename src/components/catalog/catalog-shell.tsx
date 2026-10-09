@@ -24,9 +24,24 @@ interface CatalogShellProps {
   tools: ToolWithCategory[];
   user: { name: string | null; email: string | null; role: "USER" | "ADMIN" } | null;
   coinBalance: number;
+  siteName: string;
+  logoUrl?: string;
+  heroBadge: string;
+  heroTitle: string;
+  heroSubtitle: string;
 }
 
-export function CatalogShell({ categories, tools, user, coinBalance }: CatalogShellProps) {
+export function CatalogShell({
+  categories,
+  tools,
+  user,
+  coinBalance,
+  siteName,
+  logoUrl,
+  heroBadge,
+  heroTitle,
+  heroSubtitle,
+}: CatalogShellProps) {
   const [query, setQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState<string>("all");
   const [showAllList, setShowAllList] = useState(false);
@@ -74,7 +89,7 @@ export function CatalogShell({ categories, tools, user, coinBalance }: CatalogSh
 
   return (
     <div className="flex min-h-screen flex-col bg-muted/20 pb-16 md:pb-0">
-      <TopBar user={user} coinBalance={coinBalance} />
+      <TopBar user={user} coinBalance={coinBalance} siteName={siteName} logoUrl={logoUrl} />
 
       <div className="flex flex-1">
         <Sidebar
@@ -132,7 +147,13 @@ export function CatalogShell({ categories, tools, user, coinBalance }: CatalogSh
             </div>
           ) : (
             <div className="flex flex-col gap-8">
-              <HeroBanner query={query} onQueryChange={setQuery} />
+              <HeroBanner
+                query={query}
+                onQueryChange={setQuery}
+                badge={heroBadge}
+                title={heroTitle}
+                subtitle={heroSubtitle}
+              />
 
               <CategoryIconGrid
                 categories={categories}

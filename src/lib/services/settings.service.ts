@@ -9,6 +9,9 @@ export const SETTING_KEYS = [
   "registration_enabled",
   "coin_system_enabled",
   "subscription_enabled",
+  "hero_badge",
+  "hero_title",
+  "hero_subtitle",
 ] as const;
 
 export type SettingKey = (typeof SETTING_KEYS)[number];
@@ -22,6 +25,10 @@ const DEFAULTS: Record<SettingKey, string> = {
   registration_enabled: "true",
   coin_system_enabled: "true",
   subscription_enabled: "true",
+  hero_badge: "Koleksi Lengkap",
+  hero_title: "Template, Script, dan Tools untuk Jaringan Anda",
+  hero_subtitle:
+    "Solusi praktis untuk setting MikroTik, Hotspot, OLT, VPN, dan kebutuhan jaringan lainnya dalam satu tempat.",
 };
 
 export async function getSettings(): Promise<Record<SettingKey, string>> {
