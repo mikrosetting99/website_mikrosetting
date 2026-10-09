@@ -1,107 +1,125 @@
+import { Package, Users, Crown, Coins } from "lucide-react";
+
 import { prisma } from "@/lib/db/prisma";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { StatCard } from "@/components/admin/stat-card";
+import { AdminToolsPreview } from "@/components/admin/admin-tools-preview";
+import { AdminCoinPackagesWidget } from "@/components/admin/admin-coin-packages-widget";
+import { AdminRecentTransactionsWidget } from "@/components/admin/admin-recent-transactions-widget";
+
+function computeTrend(current: number, previous: number): number {
+  if (previous === 0) return current > 0 ? 100 : 0;
+  return Math.round(((current - previous) / previous) * 1000) / 10;
+}
 
 export default async function AdminDashboardPage() {
-  const startOfToday = new Date();
-  startOfToday.setHours(0, 0, 0, 0);
+  const now = new Date();
+  const period30Start = new Date(now);
+  period30Start.setDate(period30Start.getDate() - 30);
+  const period60Start = new Date(now);
+  period60Start.setDate(period60Start.getDate() - 60);
 
   const [
     totalTools,
     totalUsers,
     activeSubscribers,
     coinSoldAgg,
-    usageToday,
+    toolsThisPeriod,
+    toolsPrevPeriod,
+    usersThisPeriod,
+    usersPrevPeriod,
+    subsThisPeriod,
+    subsPrevPeriod,
+    coinSoldThisPeriodAgg,
+    coinSoldPrevPeriodAgg,
+    tools,
+    coinPackages,
     recentTransactions,
-    recentUsages,
   ] = await Promise.all([
     prisma.tool.count(),
     prisma.user.count(),
-    prisma.subscription.count({ where: { status: "ACTIVE", endDate: { gte: new Date() } } }),
+    prisma.subscription.count({ where: { status: "ACTIVE", endDate: { gte: now } } }),
+    prisma.coinTransaction.aggregate({ where: { type: "PURCHASE" }, _sum: { amount: true } }),
+    prisma.tool.count({ where: { createdAt: { gte: period30Start } } }),
+    prisma.tool.count({ where: { createdAt: { gte: period60Start, lt: period30Start } } }),
+    prisma.user.count({ where: { createdAt: { gte: period30Start } } }),
+    prisma.user.count({ where: { createdAt: { gte: period60Start, lt: period30Start } } }),
+    prisma.subscription.count({ where: { createdAt: { gte: period30Start } } }),
+    prisma.subscription.count({ where: { createdAt: { gte: period60Start, lt: period30Start } } }),
     prisma.coinTransaction.aggregate({
-      where: { type: "PURCHASE" },
+      where: { type: "PURCHASE", createdAt: { gte: period30Start } },
       _sum: { amount: true },
     }),
-    prisma.toolUsage.count({ where: { createdAt: { gte: startOfToday } } }),
+    prisma.coinTransaction.aggregate({
+      where: { type: "PURCHASE", createdAt: { gte: period60Start, lt: period30Start } },
+      _sum: { amount: true },
+    }),
+    prisma.tool.findMany({
+      include: { category: true },
+      orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
+      take: 5,
+    }),
+    prisma.coinPackage.findMany({ orderBy: { sortOrder: "asc" }, take: 3 }),
     prisma.coinTransaction.findMany({
       orderBy: { createdAt: "desc" },
-      take: 5,
+      take: 4,
       include: { user: true },
-    }),
-    prisma.toolUsage.findMany({
-      orderBy: { createdAt: "desc" },
-      take: 5,
-      include: { user: true, tool: true },
     }),
   ]);
 
+  const coinSold = coinSoldAgg._sum.amount ?? 0;
+
   const stats = [
-    { label: "Total Tools", value: totalTools },
-    { label: "Total Users", value: totalUsers },
-    { label: "Subscriber Aktif", value: activeSubscribers },
-    { label: "Koin Terjual", value: coinSoldAgg._sum.amount ?? 0 },
-    { label: "Penggunaan Tool Hari Ini", value: usageToday },
+    {
+      label: "Total Tools",
+      value: totalTools.toLocaleString("id-ID"),
+      icon: Package,
+      iconClassName: "bg-blue-100 text-blue-600",
+      trendPercent: computeTrend(toolsThisPeriod, toolsPrevPeriod),
+    },
+    {
+      label: "User Aktif",
+      value: totalUsers.toLocaleString("id-ID"),
+      icon: Users,
+      iconClassName: "bg-emerald-100 text-emerald-600",
+      trendPercent: computeTrend(usersThisPeriod, usersPrevPeriod),
+    },
+    {
+      label: "Subscriber",
+      value: activeSubscribers.toLocaleString("id-ID"),
+      icon: Crown,
+      iconClassName: "bg-amber-100 text-amber-600",
+      trendPercent: computeTrend(subsThisPeriod, subsPrevPeriod),
+    },
+    {
+      label: "Koin Terjual",
+      value: coinSold.toLocaleString("id-ID"),
+      icon: Coins,
+      iconClassName: "bg-violet-100 text-violet-600",
+      trendPercent: computeTrend(
+        coinSoldThisPeriodAgg._sum.amount ?? 0,
+        coinSoldPrevPeriodAgg._sum.amount ?? 0,
+      ),
+    },
   ];
 
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="text-xl font-semibold">Dashboard</h1>
+      <div>
+        <h1 className="text-2xl font-bold text-foreground">Dashboard Admin</h1>
+        <p className="text-sm text-muted-foreground">Ringkasan data dan aktivitas sistem Mikrosetting.</p>
+      </div>
 
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {stats.map((stat) => (
-          <Card key={stat.label}>
-            <CardHeader className="pb-1">
-              <CardTitle className="text-xs font-normal text-muted-foreground">{stat.label}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-2xl font-semibold">{stat.value.toLocaleString("id-ID")}</p>
-            </CardContent>
-          </Card>
+          <StatCard key={stat.label} {...stat} />
         ))}
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">Transaksi Koin Terbaru</CardTitle>
-          </CardHeader>
-          <CardContent className="flex flex-col gap-2 text-sm">
-            {recentTransactions.length === 0 && (
-              <p className="text-muted-foreground">Belum ada transaksi.</p>
-            )}
-            {recentTransactions.map((tx) => (
-              <div key={tx.id} className="flex items-center justify-between border-b pb-2 last:border-0 last:pb-0">
-                <div>
-                  <p className="font-medium">{tx.user.name}</p>
-                  <p className="text-xs text-muted-foreground">{tx.type}</p>
-                </div>
-                <span className={tx.amount < 0 ? "text-destructive" : "text-emerald-600"}>
-                  {tx.amount > 0 ? "+" : ""}
-                  {tx.amount}
-                </span>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
+      <AdminToolsPreview tools={tools} />
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">Penggunaan Tool Terbaru</CardTitle>
-          </CardHeader>
-          <CardContent className="flex flex-col gap-2 text-sm">
-            {recentUsages.length === 0 && (
-              <p className="text-muted-foreground">Belum ada penggunaan tool.</p>
-            )}
-            {recentUsages.map((usage) => (
-              <div key={usage.id} className="flex items-center justify-between border-b pb-2 last:border-0 last:pb-0">
-                <div>
-                  <p className="font-medium">{usage.tool.name}</p>
-                  <p className="text-xs text-muted-foreground">{usage.user.name}</p>
-                </div>
-                <span>{usage.coinSpent > 0 ? `${usage.coinSpent} Koin` : "FREE"}</span>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
+      <div className="grid gap-4 lg:grid-cols-2">
+        <AdminCoinPackagesWidget coinPackages={coinPackages} />
+        <AdminRecentTransactionsWidget transactions={recentTransactions} />
       </div>
     </div>
   );
