@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
+import { LogoUploader } from "@/components/admin/logo-uploader";
 import { updateSettingsAction, type SettingsFormState } from "@/app/admin/settings/actions";
 import type { SettingKey } from "@/lib/services/settings.service";
 
@@ -25,10 +26,10 @@ export function SettingsForm({ settings }: { settings: Record<SettingKey, string
           <Input id="site_name" name="site_name" defaultValue={settings.site_name} />
         </div>
         <div className="flex flex-col gap-1.5">
-          <Label htmlFor="logo_url">URL Logo</Label>
-          <Input id="logo_url" name="logo_url" defaultValue={settings.logo_url} placeholder="/logo.png" />
+          <Label>Logo</Label>
+          <LogoUploader siteName={settings.site_name} logoUrl={settings.logo_url || undefined} />
           <p className="text-xs text-muted-foreground">
-            Kosongkan untuk pakai lambang huruf default. Tampil di header situs &amp; admin panel.
+            Tampil di header situs &amp; admin panel. Tanpa logo, dipakai lambang huruf default.
           </p>
         </div>
         <div className="flex flex-col gap-1.5">

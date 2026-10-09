@@ -30,6 +30,9 @@ services:
       NEXTAUTH_URL: ${NEXTAUTH_URL:-http://localhost:3000}
     ports:
       - "${APP_PORT:-3000}:3000"
+    volumes:
+      - app_uploads:/app/public/uploads
 
 volumes:
   db_data:
+  app_uploads:

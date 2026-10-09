@@ -15,7 +15,6 @@ export async function updateSettingsAction(
   try {
     await updateSettings({
       site_name: String(formData.get("site_name") ?? ""),
-      logo_url: String(formData.get("logo_url") ?? ""),
       whatsapp: String(formData.get("whatsapp") ?? ""),
       email: String(formData.get("email") ?? ""),
       maintenance_mode: formData.get("maintenance_mode") === "on" ? "true" : "false",
