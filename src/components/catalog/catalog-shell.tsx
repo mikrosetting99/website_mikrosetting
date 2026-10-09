@@ -82,7 +82,7 @@ export function CatalogShell({ categories, tools, user, coinBalance }: CatalogSh
           onSelectCategory={handleSelectCategory}
         />
 
-        <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-4 sm:px-6 sm:py-6">
+        <main className="w-full min-w-0 flex-1 px-4 py-4 sm:px-6 sm:py-6">
           {isListView && (
             <div className="mb-4 flex gap-2 overflow-x-auto md:hidden">
               <CategoryPill
