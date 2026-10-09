@@ -15,7 +15,7 @@ import { Input } from "@/components/ui/input";
 import { MobileBottomNav } from "@/components/layout/mobile-bottom-nav";
 import { Sidebar } from "@/components/layout/sidebar";
 import { TopBar } from "@/components/layout/top-bar";
-import type { Category, Tool } from "@/generated/prisma/client";
+import type { Category, Notification, Tool } from "@/generated/prisma/client";
 
 type ToolWithCategory = Tool & { category: Category };
 
@@ -29,6 +29,7 @@ interface CatalogShellProps {
   heroBadge: string;
   heroTitle: string;
   heroSubtitle: string;
+  notifications: Notification[];
 }
 
 export function CatalogShell({
@@ -41,6 +42,7 @@ export function CatalogShell({
   heroBadge,
   heroTitle,
   heroSubtitle,
+  notifications,
 }: CatalogShellProps) {
   const [query, setQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState<string>("all");
@@ -89,7 +91,13 @@ export function CatalogShell({
 
   return (
     <div className="flex min-h-screen flex-col bg-muted/20 pb-16 md:pb-0">
-      <TopBar user={user} coinBalance={coinBalance} siteName={siteName} logoUrl={logoUrl} />
+      <TopBar
+        user={user}
+        coinBalance={coinBalance}
+        siteName={siteName}
+        logoUrl={logoUrl}
+        notifications={notifications}
+      />
 
       <div className="flex flex-1">
         <Sidebar

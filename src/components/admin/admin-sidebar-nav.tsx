@@ -12,6 +12,7 @@ import {
   PackagePlus,
   History,
   Settings,
+  Bell,
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -25,6 +26,7 @@ const NAV = [
   { href: "/admin/coin-transactions", label: "Transaksi Koin", icon: Coins },
   { href: "/admin/coin-packages", label: "Paket Koin", icon: PackagePlus },
   { href: "/admin/tool-usage", label: "Riwayat Tool", icon: History },
+  { href: "/admin/notifications", label: "Notifikasi", icon: Bell },
 ];
 
 export function AdminSidebarNav() {

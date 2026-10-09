@@ -7,7 +7,7 @@ import { CatalogShell } from "@/components/catalog/catalog-shell";
 export default async function HomePage() {
   const session = await auth();
 
-  const [categories, tools, settings] = await Promise.all([
+  const [categories, tools, settings, notifications] = await Promise.all([
     prisma.category.findMany({
       where: { isActive: true },
       orderBy: { sortOrder: "asc" },
@@ -18,6 +18,11 @@ export default async function HomePage() {
       include: { category: true },
     }),
     getSettings(),
+    prisma.notification.findMany({
+      where: { isActive: true },
+      orderBy: { createdAt: "desc" },
+      take: 20,
+    }),
   ]);
 
   const coinBalance = session?.user ? await getCoinBalance(session.user.id) : 0;
@@ -37,6 +42,7 @@ export default async function HomePage() {
       heroBadge={settings.hero_badge}
       heroTitle={settings.hero_title}
       heroSubtitle={settings.hero_subtitle}
+      notifications={notifications}
     />
   );
 }
