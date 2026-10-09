@@ -1,0 +1,196 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+enum ToolAccessType {
+  FREE
+  COIN
+  SUBSCRIBER
+}
+
+enum CoinTransactionType {
+  PURCHASE
+  TOOL_USAGE
+  BONUS
+  ADMIN_ADJUSTMENT
+  REFUND
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  EXPIRED
+  REFUNDED
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  EXPIRED
+  CANCELLED
+}
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         UserRole @default(USER)
+  coinBalance  Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  coinTransactions CoinTransaction[]
+  toolUsages       ToolUsage[]
+  subscriptions    Subscription[]
+  payments         Payment[]
+
+  @@index([email])
+}
+
+model Category {
+  id        String   @id @default(cuid())
+  name      String
+  slug      String   @unique
+  icon      String?
+  sortOrder Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  tools Tool[]
+
+  @@index([slug])
+}
+
+model Tool {
+  id               String         @id @default(cuid())
+  categoryId       String
+  name             String
+  slug             String         @unique
+  shortDescription String
+  description      String
+  icon             String?
+  accessType       ToolAccessType @default(FREE)
+  coinCost         Int            @default(0)
+  isActive         Boolean        @default(true)
+  sortOrder        Int            @default(0)
+  isFeatured       Boolean        @default(false)
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+
+  category    Category          @relation(fields: [categoryId], references: [id])
+  usages      ToolUsage[]
+  transactions CoinTransaction[]
+
+  @@index([slug])
+  @@index([categoryId])
+}
+
+model CoinTransaction {
+  id             String              @id @default(cuid())
+  userId         String
+  type           CoinTransactionType
+  amount         Int
+  balanceBefore  Int
+  balanceAfter   Int
+  toolId         String?
+  description    String?
+  createdAt      DateTime            @default(now())
+
+  user User  @relation(fields: [userId], references: [id])
+  tool Tool? @relation(fields: [toolId], references: [id])
+
+  @@index([userId])
+  @@index([createdAt])
+}
+
+model ToolUsage {
+  id         String   @id @default(cuid())
+  userId     String
+  toolId     String
+  coinSpent  Int      @default(0)
+  createdAt  DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+  tool Tool @relation(fields: [toolId], references: [id])
+
+  @@index([userId])
+  @@index([toolId])
+}
+
+model CoinPackage {
+  id         String   @id @default(cuid())
+  name       String
+  coinAmount Int
+  price      Int
+  bonusCoin  Int      @default(0)
+  isActive   Boolean  @default(true)
+  sortOrder  Int      @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  payments Payment[]
+}
+
+model Payment {
+  id            String        @id @default(cuid())
+  userId        String
+  coinPackageId String
+  amount        Int
+  status        PaymentStatus @default(PENDING)
+  provider      String?
+  providerRef   String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  user        User        @relation(fields: [userId], references: [id])
+  coinPackage CoinPackage @relation(fields: [coinPackageId], references: [id])
+
+  @@index([userId])
+  @@index([status])
+}
+
+model SubscriptionPlan {
+  id           String   @id @default(cuid())
+  name         String
+  price        Int
+  durationDays Int
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  subscriptions Subscription[]
+}
+
+model Subscription {
+  id        String             @id @default(cuid())
+  userId    String
+  planId    String
+  startDate DateTime           @default(now())
+  endDate   DateTime
+  status    SubscriptionStatus @default(ACTIVE)
+  createdAt DateTime           @default(now())
+  updatedAt DateTime           @updatedAt
+
+  user User             @relation(fields: [userId], references: [id])
+  plan SubscriptionPlan @relation(fields: [planId], references: [id])
+
+  @@index([userId])
+}
+
+model Setting {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt
+}
