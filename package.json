@@ -12,7 +12,7 @@
     "db:deploy": "prisma migrate deploy",
     "db:seed": "prisma db seed",
     "db:studio": "prisma studio",
-    "create-admin": "node --experimental-strip-types prisma/create-admin.ts"
+    "create-admin": "tsx prisma/create-admin.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.8.0",
@@ -45,11 +45,13 @@
     "eslint": "^9",
     "eslint-config-next": "16.4.0",
     "tailwindcss": "^4",
+    "tsx": "^4.23.15",
     "typescript": "^5"
   },
   "allowScripts": {
     "@prisma/engines@7.10.0": true,
     "prisma@7.10.0": true,
-    "unrs-resolver@1.12.2": true
+    "unrs-resolver@1.12.2": true,
+    "esbuild@0.28.2": true
   }
 }

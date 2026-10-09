@@ -83,12 +83,12 @@ docker compose up -d
 - `db` — PostgreSQL 16 dengan volume persisten `db_data`
 - `app` — build Next.js (`output: "standalone"`), otomatis connect ke service `db`
 
-Setelah container `app` jalan, masuk ke container untuk migrate + seed + buat admin:
+Container `app` memakai Next.js standalone output (tanpa `node_modules` penuh), jadi migrate/seed/create-admin dijalankan dari **host** — `docker-compose.yml` mengekspos port `POSTGRES_PORT` (default 5432) ke host, jadi cukup pastikan `DATABASE_URL` di `.env` host mengarah ke `localhost:<POSTGRES_PORT>` dengan kredensial yang sama:
 
 ```bash
-docker compose exec app npx prisma migrate deploy
-docker compose exec app node --experimental-strip-types prisma/seed.ts
-docker compose exec app sh -c "ADMIN_EMAIL=admin@mikrosetting.com ADMIN_PASSWORD=passwordAdmin123 node --experimental-strip-types prisma/create-admin.ts"
+npm run db:deploy
+npm run db:seed
+npm run create-admin -- admin@mikrosetting.com passwordAdmin123 "Super Admin"
 ```
 
 ## Struktur Proyek
