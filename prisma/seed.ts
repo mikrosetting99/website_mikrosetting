@@ -29,6 +29,17 @@ const TOOLS = [
     isFeatured: true,
   },
   {
+    categorySlug: "mikrotik",
+    name: "Setting Mikrotik Baru",
+    slug: "setting-mikrotik-baru",
+    shortDescription: "Versi terbaru generator konfigurasi MikroTik.",
+    description: "Kumpulan script dasar untuk konfigurasi router MikroTik: interface, IP address, dan routing. Versi terbaru dari Setting MikroTik.",
+    icon: "router",
+    accessType: "FREE" as const,
+    coinCost: 0,
+    sortOrder: 2,
+  },
+  {
     categorySlug: "hotspot",
     name: "Login Page Hotspot",
     slug: "login-page-hotspot",
@@ -37,7 +48,7 @@ const TOOLS = [
     icon: "wifi",
     accessType: "FREE" as const,
     coinCost: 0,
-    sortOrder: 2,
+    sortOrder: 3,
     isFeatured: true,
   },
   {
@@ -49,7 +60,7 @@ const TOOLS = [
     icon: "shield",
     accessType: "COIN" as const,
     coinCost: 10,
-    sortOrder: 3,
+    sortOrder: 4,
     isFeatured: true,
   },
   {
@@ -61,7 +72,7 @@ const TOOLS = [
     icon: "router",
     accessType: "COIN" as const,
     coinCost: 10,
-    sortOrder: 4,
+    sortOrder: 5,
     isFeatured: true,
   },
   {
@@ -73,7 +84,7 @@ const TOOLS = [
     icon: "wrench",
     accessType: "FREE" as const,
     coinCost: 0,
-    sortOrder: 5,
+    sortOrder: 6,
   },
   {
     categorySlug: "tools",
@@ -84,7 +95,7 @@ const TOOLS = [
     icon: "wrench",
     accessType: "COIN" as const,
     coinCost: 5,
-    sortOrder: 6,
+    sortOrder: 7,
   },
   {
     categorySlug: "website",
@@ -95,7 +106,7 @@ const TOOLS = [
     icon: "globe",
     accessType: "COIN" as const,
     coinCost: 10,
-    sortOrder: 7,
+    sortOrder: 8,
   },
   {
     categorySlug: "olt",
@@ -106,7 +117,7 @@ const TOOLS = [
     icon: "network",
     accessType: "SUBSCRIBER" as const,
     coinCost: 0,
-    sortOrder: 8,
+    sortOrder: 9,
   },
   {
     categorySlug: "mikrotik",
@@ -117,7 +128,7 @@ const TOOLS = [
     icon: "router",
     accessType: "FREE" as const,
     coinCost: 0,
-    sortOrder: 9,
+    sortOrder: 10,
   },
 ];
 
