@@ -1,20 +1,17 @@
 "use client";
 
 import Link from "next/link";
-import { Bell, Coins, LogIn, Search } from "lucide-react";
+import { Bell, Coins, LogIn } from "lucide-react";
 
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { UserMenu } from "@/components/layout/user-menu";
 
 interface TopBarProps {
-  query: string;
-  onQueryChange: (value: string) => void;
   user: { name: string | null; email: string | null; role: "USER" | "ADMIN" } | null;
   coinBalance: number;
 }
 
-export function TopBar({ query, onQueryChange, user, coinBalance }: TopBarProps) {
+export function TopBar({ user, coinBalance }: TopBarProps) {
   return (
     <header className="sticky top-0 z-20 border-b bg-background">
       <div className="flex items-center gap-3 px-4 py-3 sm:px-6">
@@ -26,16 +23,6 @@ export function TopBar({ query, onQueryChange, user, coinBalance }: TopBarProps)
             MIKRO<span className="text-primary">SETTING</span>
           </span>
         </Link>
-
-        <div className="relative hidden flex-1 max-w-md md:block">
-          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            value={query}
-            onChange={(e) => onQueryChange(e.target.value)}
-            placeholder="Cari tool, template, atau script..."
-            className="pl-9"
-          />
-        </div>
 
         <div className="ml-auto flex items-center gap-2">
           {user ? (
@@ -60,16 +47,6 @@ export function TopBar({ query, onQueryChange, user, coinBalance }: TopBarProps)
             </Button>
           )}
         </div>
-      </div>
-
-      <div className="relative px-4 pb-3 md:hidden">
-        <Search className="pointer-events-none absolute left-7 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-        <Input
-          value={query}
-          onChange={(e) => onQueryChange(e.target.value)}
-          placeholder="Cari tool, template, atau script..."
-          className="pl-9"
-        />
       </div>
     </header>
   );

@@ -11,6 +11,7 @@ import { CategoryIconGrid } from "./category-icon-grid";
 import { CategoryBreakdown } from "./category-breakdown";
 import { DynamicIcon } from "@/lib/icons";
 import { cn } from "@/lib/utils";
+import { Input } from "@/components/ui/input";
 import { MobileBottomNav } from "@/components/layout/mobile-bottom-nav";
 import { Sidebar } from "@/components/layout/sidebar";
 import { TopBar } from "@/components/layout/top-bar";
@@ -73,7 +74,7 @@ export function CatalogShell({ categories, tools, user, coinBalance }: CatalogSh
 
   return (
     <div className="flex min-h-screen flex-col bg-muted/20 pb-16 md:pb-0">
-      <TopBar query={query} onQueryChange={setQuery} user={user} coinBalance={coinBalance} />
+      <TopBar user={user} coinBalance={coinBalance} />
 
       <div className="flex flex-1">
         <Sidebar
@@ -104,7 +105,7 @@ export function CatalogShell({ categories, tools, user, coinBalance }: CatalogSh
 
           {isListView ? (
             <div className="flex flex-col gap-3">
-              <div className="flex items-center justify-between">
+              <div className="flex flex-wrap items-center justify-between gap-2">
                 <button
                   onClick={() => {
                     setQuery("");
@@ -117,6 +118,15 @@ export function CatalogShell({ categories, tools, user, coinBalance }: CatalogSh
                 <span className="text-sm text-muted-foreground">
                   {filteredTools.length} tool ditemukan
                 </span>
+              </div>
+              <div className="relative max-w-sm">
+                <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder="Cari tool, template, atau script..."
+                  className="pl-9"
+                />
               </div>
               <ToolListView tools={filteredTools} />
             </div>
